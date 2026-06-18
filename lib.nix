@@ -227,8 +227,14 @@ let
     # Helper function for defining a per-system option that
     # gets transposed by the usual flake system logic to a
     # top-level flake attribute.
-    mkTransposedPerSystemModule = { name, option, file }: {
+    mkTransposedPerSystemModule = args@{ name, option, file }: {
       _file = file;
+
+
+if name == "flakeModule" || name == "flakeModules"
+# Pass the exact attrset as-is, aborting any evaluation of option structures
+  then args 
+  else {
 
       options = {
         flake.${name} = mkOption {
@@ -253,6 +259,7 @@ let
       config = {
         transposition.${name} = { };
       };
+     };
     };
 
     # Needed pending https://github.com/NixOS/nixpkgs/pull/198450
